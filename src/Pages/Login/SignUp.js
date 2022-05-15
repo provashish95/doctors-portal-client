@@ -1,18 +1,18 @@
 import React from 'react';
-import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
+import { useCreateUserWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import auth from '../../firebase.init';
 import { useForm } from "react-hook-form";
 import Loading from '../Shared/Loading';
 import { Link } from 'react-router-dom';
 
-const Login = () => {
+const SignUp = () => {
     const [signInWithGoogle, googleUser, googleLoading, googleError] = useSignInWithGoogle(auth);
     const [
-        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
         emailPassUser,
         emailPassLoading,
         emailPassError,
-    ] = useSignInWithEmailAndPassword(auth);
+    ] = useCreateUserWithEmailAndPassword(auth);
 
     const { register, formState: { errors }, handleSubmit } = useForm();
     let errorMassage;
@@ -24,11 +24,11 @@ const Login = () => {
         errorMassage = <p className='text-red-500'>{googleError?.message || emailPassError?.message}</p>
     }
     if (googleUser || emailPassUser) {
-        console.log(googleUser, emailPassUser);
+        console.log(emailPassUser);
     }
 
     const onSubmit = data => {
-        signInWithEmailAndPassword(data.email, data.password)
+        createUserWithEmailAndPassword(data.email, data.password)
     };
 
 
@@ -39,6 +39,27 @@ const Login = () => {
                     <h2 className="text-center text-2xl font-bold">Login</h2>
                     <form onSubmit={handleSubmit(onSubmit)}>
 
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">Name</span>
+                            </label>
+                            <input
+                                {...register("name", {
+                                    required: {
+                                        value: true,
+                                        message: 'Name is required'
+                                    }
+                                }
+                                )}
+                                type="text"
+                                name="name"
+                                placeholder="Your Name"
+                                className="input input-bordered w-full max-w-xs"
+                            />
+                            <label className="label">
+                                {errors.name?.type === 'required' && <span className="label-text-alt text-red-500">{errors.name.message}</span>}
+                            </label>
+                        </div>
                         <div className="form-control w-full max-w-xs">
                             <label className="label">
                                 <span className="label-text">Email</span>
@@ -93,9 +114,9 @@ const Login = () => {
                             </label>
                         </div>
                         {errorMassage}
-                        <input type="submit" className='btn w-full max-w-xs ' value="Log in" />
+                        <input type="submit" className='btn w-full max-w-xs ' value="Sign Up" />
                     </form>
-                    <p><small>New to doctors portal ? <Link to="/signUp" className='text-primary'>Create New Account</Link></small></p>
+                    <p><small>Already have an account ? <Link to="/login" className='text-primary'>Please Login</Link></small></p>
                     <div className="divider">OR</div>
                     <button onClick={() => signInWithGoogle()} className="btn btn-outline">Continue with google</button>
                 </div>
@@ -104,4 +125,6 @@ const Login = () => {
     );
 };
 
-export default Login;
+
+
+export default SignUp;
