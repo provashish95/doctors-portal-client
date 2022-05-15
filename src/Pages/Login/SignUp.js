@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCreateUserWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
+import { useCreateUserWithEmailAndPassword, useSignInWithGoogle, useUpdateProfile } from 'react-firebase-hooks/auth';
 import auth from '../../firebase.init';
 import { useForm } from "react-hook-form";
 import Loading from '../Shared/Loading';
@@ -13,22 +13,25 @@ const SignUp = () => {
         emailPassLoading,
         emailPassError,
     ] = useCreateUserWithEmailAndPassword(auth);
+    const [updateProfile, updating, updateError] = useUpdateProfile(auth);
 
     const { register, formState: { errors }, handleSubmit } = useForm();
     let errorMassage;
 
-    if (googleLoading || emailPassLoading) {
+    if (googleLoading || emailPassLoading || updating) {
         return <Loading></Loading>
     }
-    if (googleError || emailPassError) {
+    if (googleError || emailPassError || updateError) {
         errorMassage = <p className='text-red-500'>{googleError?.message || emailPassError?.message}</p>
     }
     if (googleUser || emailPassUser) {
         console.log(emailPassUser);
     }
 
-    const onSubmit = data => {
-        createUserWithEmailAndPassword(data.email, data.password)
+    const onSubmit = async (data) => {
+        await createUserWithEmailAndPassword(data.email, data.password)
+        await updateProfile({ displayName: data.name });
+        console.log("update done!");
     };
 
 
@@ -121,7 +124,7 @@ const SignUp = () => {
                     <button onClick={() => signInWithGoogle()} className="btn btn-outline">Continue with google</button>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 
