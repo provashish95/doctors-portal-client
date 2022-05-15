@@ -3,6 +3,7 @@ import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-fireba
 import auth from '../../firebase.init';
 import { useForm } from "react-hook-form";
 import Loading from '../Shared/Loading';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
     const [signInWithGoogle, googleUser, googleLoading, googleError] = useSignInWithGoogle(auth);
@@ -14,13 +15,13 @@ const Login = () => {
     ] = useSignInWithEmailAndPassword(auth);
 
     const { register, formState: { errors }, handleSubmit } = useForm();
-    let errorMeaage;
+    let errorMassage;
 
     if (googleLoading || emailPassLoading) {
         return <Loading></Loading>
     }
     if (googleError || emailPassError) {
-        errorMeaage = <p className='text-red-500'>{googleError?.message || emailPassError?.message}</p>
+        errorMassage = <p className='text-red-500'>{googleError?.message || emailPassError?.message}</p>
     }
     if (googleUser) {
         console.log(googleUser);
@@ -91,14 +92,15 @@ const Login = () => {
                                 {errors.password?.type === 'minLength' && <span className="label-text-alt text-red-500">{errors.password.message}</span>}
                             </label>
                         </div>
-                        {errorMeaage}
+                        {errorMassage}
                         <input type="submit" className='btn w-full max-w-xs ' value="Log in" />
                     </form>
+                    <p><small>New to doctors portal ? <Link to="/signUp" className='text-primary'>Create New Account</Link></small></p>
                     <div className="divider">OR</div>
                     <button onClick={() => signInWithGoogle()} className="btn btn-outline">Continue with google</button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
