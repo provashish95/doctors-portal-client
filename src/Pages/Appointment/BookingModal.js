@@ -2,10 +2,12 @@ import React from 'react';
 import { format } from 'date-fns';
 import auth from '../../firebase.init';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { toast } from 'react-toastify';
+
 
 const BookingModal = ({ treatment, date, setTreatment }) => {
     const { _id, name, slots } = treatment;
-    const [user, loading, error] = useAuthState(auth);
+    const [user] = useAuthState(auth);
     const formattedDate = format(date, 'PP');
 
 
@@ -24,7 +26,23 @@ const BookingModal = ({ treatment, date, setTreatment }) => {
             phone: event.target.phone.value
         }
 
-        setTreatment(null);
+        fetch('http://localhost:5000/booking', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(booking)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    toast.success(`${data.message} & Your Appointment is set ${formattedDate} at ${slot}`);
+
+                } else {
+                    toast.error(`Already have an Appointment on ${data.booking?.date} at ${data.booking?.slot}`);
+                }
+                setTreatment(null);
+            })
     }
 
 
@@ -51,7 +69,7 @@ const BookingModal = ({ treatment, date, setTreatment }) => {
 
                         <input type="text" name="name" disabled value={user?.displayName || ' '} className="input w-full max-w-xs" />
                         <input type="email" name="email" disabled value={user?.email || ' '} className="input w-full max-w-xs" />
-                        <input type="text" name="phone" placeholder="Phone" className="input w-full max-w-xs" />
+                        <input type="text" name="phone" placeholder="Phone" className="input w-full max-w-xs" required />
                         <input type="submit" value="Submit" className="btn btn-secondary w-full max-w-xs" />
                     </form>
 
