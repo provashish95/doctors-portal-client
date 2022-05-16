@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import BookingModal from './BookingModal';
 import Service from './Service';
 import { useQuery } from 'react-query';
