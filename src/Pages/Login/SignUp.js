@@ -4,6 +4,7 @@ import auth from '../../firebase.init';
 import { useForm } from "react-hook-form";
 import Loading from '../Shared/Loading';
 import { Link, useNavigate } from 'react-router-dom';
+import useToken from '../../hook/useToken';
 
 const SignUp = () => {
     const [signInWithGoogle, googleUser, googleLoading, googleError] = useSignInWithGoogle(auth);
@@ -14,6 +15,8 @@ const SignUp = () => {
         emailPassError,
     ] = useCreateUserWithEmailAndPassword(auth);
     const [updateProfile, updating, updateError] = useUpdateProfile(auth);
+    const [token] = useToken(googleUser || emailPassUser);
+
     const navigate = useNavigate();
     const { register, formState: { errors }, handleSubmit } = useForm();
     let errorMassage;
@@ -24,15 +27,15 @@ const SignUp = () => {
     if (googleError || emailPassError || updateError) {
         errorMassage = <p className='text-red-500'>{googleError?.message || emailPassError?.message}</p>
     }
-    if (googleUser || emailPassUser) {
-        console.log(emailPassUser);
+    if (token) {
+        navigate('/appointment');
     }
 
     const onSubmit = async (data) => {
         await createUserWithEmailAndPassword(data.email, data.password)
         await updateProfile({ displayName: data.name });
         console.log("update done");
-        navigate('/appointment');
+
     };
 
 
