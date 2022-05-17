@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useCreateUserWithEmailAndPassword, useSignInWithGoogle, useUpdateProfile } from 'react-firebase-hooks/auth';
 import auth from '../../firebase.init';
 import { useForm } from "react-hook-form";
@@ -21,15 +21,19 @@ const SignUp = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
     let errorMassage;
 
+    useEffect(() => {
+        if (token) {
+            navigate('/appointment');
+        }
+    }, [navigate, token])
+
     if (googleLoading || emailPassLoading || updating) {
         return <Loading></Loading>
     }
     if (googleError || emailPassError || updateError) {
         errorMassage = <p className='text-red-500'>{googleError?.message || emailPassError?.message}</p>
     }
-    if (token) {
-        navigate('/appointment');
-    }
+
 
     const onSubmit = async (data) => {
         await createUserWithEmailAndPassword(data.email, data.password)
