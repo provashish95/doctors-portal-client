@@ -6,7 +6,7 @@ import Loading from '../Shared/Loading';
 const MyAppointments = () => {
     const [appointments, setAppointments] = useState();
     const [user, loading] = useAuthState(auth);
-    let i = 1;
+
 
     useEffect(() => {
         if (user) {
@@ -36,8 +36,8 @@ const MyAppointments = () => {
                     </thead>
                     <tbody>
                         {
-                            appointments?.map(appointment => <tr key={appointment._id}>
-                                <th>{i++}</th>
+                            appointments?.map((appointment, index) => <tr key={appointment._id}>
+                                <th>{index + 1}</th>
                                 <td>{appointment.patientName}</td>
                                 <td>{appointment.date}</td>
                                 <td>{appointment.treatmentName}</td>
