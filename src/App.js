@@ -17,6 +17,7 @@ import MyReview from './Pages/Dashboard/MyReview';
 import AllUsers from './Pages/Dashboard/AllUsers';
 import RequireAdmin from './Pages/Login/RequireAdmin';
 import AddDoctors from './Pages/Dashboard/AddDoctors';
+import ManageDoctors from './Pages/Dashboard/ManageDoctors';
 
 function App() {
   return (
@@ -39,16 +40,25 @@ function App() {
         }>
           <Route index element={<MyAppointments></MyAppointments>}></Route>
           <Route path='review' element={<MyReview></MyReview>}></Route>
+
           <Route path='users' element={
             <RequireAdmin>
               <AllUsers></AllUsers>
             </RequireAdmin>
           }></Route>
+
           <Route path='addDoctor' element={
             <RequireAdmin>
               <AddDoctors></AddDoctors>
             </RequireAdmin>
           }></Route>
+
+          <Route path='manageDoctors' element={
+            <RequireAdmin>
+              <ManageDoctors></ManageDoctors>
+            </RequireAdmin>
+          }></Route>
+
         </Route>
         {/* nested route for protected dashboard... */}
 
