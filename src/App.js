@@ -18,6 +18,7 @@ import AllUsers from './Pages/Dashboard/AllUsers';
 import RequireAdmin from './Pages/Login/RequireAdmin';
 import AddDoctors from './Pages/Dashboard/AddDoctors';
 import ManageDoctors from './Pages/Dashboard/ManageDoctors';
+import Payment from './Pages/Dashboard/Payment';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Home></Home>}></Route>
         <Route path='/about' element={<About></About>}></Route>
+
         <Route path='/appointment' element={
           <RequireAuth>
             <Appointment></Appointment>
@@ -33,13 +35,14 @@ function App() {
         }></Route>
 
         {/* nested route for protected dashboard... */}
-        <Route path='/dashboard' element={
+        <Route path='dashboard' element={
           <RequireAuth>
             <Dashboard></Dashboard>
           </RequireAuth>
         }>
           <Route index element={<MyAppointments></MyAppointments>}></Route>
           <Route path='review' element={<MyReview></MyReview>}></Route>
+          <Route path='payment/:id' element={<Payment></Payment>}></Route>
 
           <Route path='users' element={
             <RequireAdmin>
