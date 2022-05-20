@@ -2,14 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 
 const CheckoutForm = ({ appointment }) => {
-    const { price } = appointment;
+    const { _id, price, patientName, patientEmail } = appointment;
     const stripe = useStripe();
     const elements = useElements();
     const [cardError, setCardError] = useState('');
     const [clientSecret, setClientSecret] = useState('');
+    const [success, setSuccess] = useState('');
+    const [transactionId, setTransactionId] = useState('');
+    const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
-        fetch('http://localhost:5000/create-payment-intent', {
+        fetch('https://pacific-badlands-31165.herokuapp.com/create-payment-intent', {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -24,7 +27,7 @@ const CheckoutForm = ({ appointment }) => {
                 }
             })
 
-    }, [price])
+    }, [price]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -43,6 +46,50 @@ const CheckoutForm = ({ appointment }) => {
 
         //cehck card error here and set message into hook 
         setCardError(error?.message || ' ');
+        setSuccess('');
+        setProcessing(true);
+        //confirm card payment
+        const { paymentIntent, error: intentError } = await stripe.confirmCardPayment(
+            clientSecret,
+            {
+                payment_method: {
+                    card: card,
+                    billing_details: {
+                        name: patientName,
+                        email: patientEmail
+                    },
+                },
+            },
+        );
+
+        if (intentError) {
+            setCardError(setCardError?.message);
+            setProcessing(false);
+        } else {
+            setTransactionId(paymentIntent?.id)
+            setCardError('');
+            setSuccess('Congrats, Your payment is completed');
+
+            //store  payment on  database
+            const payment = {
+                appointment: _id,
+                transactionId: paymentIntent.id
+            }
+
+            fetch(`https://pacific-badlands-31165.herokuapp.com/booking/${_id}`, {
+                method: 'PATCH',
+                headers: {
+                    'content-type': 'application/json',
+                    'authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                body: JSON.stringify(payment)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    setProcessing(false)
+                    console.log(data);
+                })
+        }
     };
 
 
@@ -71,6 +118,12 @@ const CheckoutForm = ({ appointment }) => {
             </form>
             {
                 cardError ? <p className='text-red-500'>{cardError}</p> : ''
+            }
+            {
+                success ? <div className='text-green-500'>
+                    <p>{success}</p>
+                    <p>Your transaction id : <span className='text-orange-500 font-bold'>{transactionId}</span></p>
+                </div> : ''
             }
         </>
     );
